@@ -51,7 +51,7 @@ To obtain a token, use the login/signup endpoints.
 ### User Login
 
 - **URL:** `/user/login`
-- **Method:** `POST`
+- **Method:** `GET`
 - **Description:** Authenticates a user.
 - **Request Body:**
 
