@@ -73,6 +73,38 @@ To obtain a token, use the login/signup endpoints.
 }
 ```
 
+### Get User Info
+
+## Endpoint
+
+- **URL** `/user`
+- **Method:** `POST`
+- **Description:** Creates a new issue.
+- **Authentication:** Required
+
+## Request Headers
+
+Include the JWT token in the 'Authorization' header of the request.
+
+Example:
+```
+Authorization: Bearer <your-jwt-token>
+```
+
+## Response
+
+A successful request will return the user information (excluding the password) in JSON format.
+
+Example Response:
+```json
+{
+  "id": 1,
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john.doe@example.com"
+}
+```
+
 ### Get All Issues
 
 - **URL:** `/issues`
