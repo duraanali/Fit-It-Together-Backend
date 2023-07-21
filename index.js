@@ -119,6 +119,31 @@ app.post('/api/user/login', (req, res) => {
   });
 });
 
+// Get information of the current logged-in user
+app.get('/api/user', verifyToken, async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  try {
+    const user = await runQuery('SELECT * FROM users WHERE id = ?', [req.user.id]);
+
+    if (user.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Do not include the password in the response
+    const { password, ...userInfo } = user[0];
+
+    res.json(userInfo);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+
+
 // get all issues
 app.get('/api/issues', async (req, res) => {
     try {
