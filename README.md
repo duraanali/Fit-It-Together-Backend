@@ -4,7 +4,7 @@ This is the documentation for the API endpoints provided by the server.
 
 ## Base URL
 
-The base URL for all API endpoints is: `http://localhost:9001/api`
+The base URL for all API endpoints is: `https://fix-it-together-eda1be1fe9b5.herokuapp.com/api`
 
 ## Authentication
 
@@ -70,6 +70,38 @@ To obtain a token, use the login/signup endpoints.
   "message": "User logged in successfully",
   "user_id": <user_id>,
   "token": "<token>"
+}
+```
+
+### Get User Info
+
+## Endpoint
+
+- **URL** `/user`
+- **Method:** `POST`
+- **Description:** Creates a new issue.
+- **Authentication:** Required
+
+## Request Headers
+
+Include the JWT token in the 'Authorization' header of the request.
+
+Example:
+```
+Authorization: Bearer <your-jwt-token>
+```
+
+## Response
+
+A successful request will return the user information (excluding the password) in JSON format.
+
+Example Response:
+```json
+{
+  "id": 1,
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john.doe@example.com"
 }
 ```
 
