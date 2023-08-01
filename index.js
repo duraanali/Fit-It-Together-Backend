@@ -257,29 +257,38 @@ app.delete('/api/issues/:issue_id', verifyToken, async (req, res) => {
 
 // Upvote an issue
 app.post('/api/issues/:issue_id/upvote', verifyToken, async (req, res) => {
-    if (!req.user) {
-      return res.status(401).json({ error: 'Authentication required' });
+  if (!req.user) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const { issue_id } = req.params;
+
+  try {
+    const issue = await runQuery('SELECT * FROM issues WHERE id = ?', [issue_id]);
+
+    if (issue.length === 0) {
+      return res.status(404).json({ error: 'Issue not found' });
     }
-  
-    const { issue_id } = req.params;
-  
-    try {
-      const issue = await runQuery('SELECT * FROM issues WHERE id = ?', [issue_id]);
-  
-      if (issue.length === 0) {
-        return res.status(404).json({ error: 'Issue not found' });
-      }
-  
-      issue[0].upvotes += 1;
-  
-      await runQuery('UPDATE issues SET upvotes = ? WHERE id = ?', [issue[0].upvotes, issue_id]);
-  
-      res.json({ message: 'Issue upvoted successfully', issue_id: issue[0].id });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'An error occurred' });
+
+    const userHasUpvoted = issue[0].upvoted_by.includes(req.user.id);
+
+    if (userHasUpvoted) {
+      // User has already upvoted, remove the upvote
+      const updatedUpvotedBy = issue[0].upvoted_by.filter(userId => userId !== req.user.id);
+      await runQuery('UPDATE issues SET upvotes = ?, upvoted_by = ? WHERE id = ?', [issue[0].upvotes - 1, updatedUpvotedBy, issue_id]);
+    } else {
+      // User has not upvoted yet, add the upvote
+      const updatedUpvotedBy = [...issue[0].upvoted_by, req.user.id];
+      await runQuery('UPDATE issues SET upvotes = ?, upvoted_by = ? WHERE id = ?', [issue[0].upvotes + 1, updatedUpvotedBy, issue_id]);
     }
-  });
+
+    res.json({ message: 'Issue upvote toggled successfully', issue_id: issue[0].id });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
   
   // Downvote an issue
   app.post('/api/issues/:issue_id/downvote', verifyToken, async (req, res) => {
